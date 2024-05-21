@@ -89,6 +89,9 @@ export const LoadContainer = styled.div`
   width: 100%;
   height: 100%;
   margin: 10rem 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
   flex: 1;
   display: flex;
   align-items: center;

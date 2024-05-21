@@ -23,9 +23,9 @@ const Modal = ({ children, title , isOpen, setClose}) => {
           </Text>
           <S.IconClose onClick={()=> (setModal(!modal), setClose())} />
         </S.ContainerHeader>
-        <S.CardContent>
+        <S.Overflow>
         {children}
-        </S.CardContent>
+        </S.Overflow>
       </S.Container>
     </S.Section>
   );

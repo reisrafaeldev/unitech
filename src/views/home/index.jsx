@@ -12,7 +12,7 @@ import Load from "../../components/load";
 import { useLogin } from "../../contex/authContex";
 import Button from "../../components/button";
 import { BallTriangle } from "react-loader-spinner";
-import { useCompletion } from "ai/react";
+import axios from "axios";
 
 const Home = () => {
   const MAX_TOKENS = 4096;
@@ -29,6 +29,9 @@ const Home = () => {
   const [temp, setTemp] = useState(0.75);
   const [topP, setTopP] = useState(0.9);
   const [maxTokens, setMaxTokens] = useState(800);
+  const bardApi = axios.create({
+    baseURL: "http://localhost:5000/gmni",
+  });
 
   const nav = useNavigate();
   const [titleModal, setTitleModal] = useState("teste");
@@ -40,6 +43,7 @@ const Home = () => {
   const [idModal, setIdModal] = useState();
   const { handleCpf, sessionToken } = useLogin();
   const [openModal, setOpenModal] = useState(false);
+  const [questionOptions, setQuestionOption] = useState();
   const options = [
     { label: "Álgebra", isSelected: false },
     { label: "Geometria", isSelected: false },
@@ -52,7 +56,7 @@ const Home = () => {
   const [temaButtons, setTemaButtons] = useState([]);
   const [disciplinaButtons, setDisciplinaButtons] = useState([
     { label: "Matemática", isSelected: false },
-    { label: "História", isSelected: false },
+    { label: "Português", isSelected: false },
   ]);
   const [grauButtons, setGrauButtons] = useState([
     { label: "Fácil", isSelected: false },
@@ -62,6 +66,14 @@ const Home = () => {
 
   const handleButtonClick = (clickedLabel) => {
     const updatedButtons = temaButtons.map((button) => ({
+      ...button,
+      isSelected: button.label === clickedLabel,
+    }));
+
+    setTemaButtons(updatedButtons);
+  };
+  const handleOptionsButtonClick = (clickedLabel) => {
+    const updatedButtons = questionOptions.map((button) => ({
       ...button,
       isSelected: button.label === clickedLabel,
     }));
@@ -112,28 +124,94 @@ const Home = () => {
   };
 
   const generateQuestions = () => {
+    handleClick();
+    setData("");
     setOpenModal(true);
   };
 
+  const handleClick = async () => {
+    setLoad(true);
+    setOpenModal(true);
+    const subject = disciplinaButtons.filter((button) => button.isSelected);
+
+    const academic_level = grauButtons.filter((button) => button.isSelected);
+    const theme = temaButtons.filter((button) => button.isSelected);
+    console.log(disciplinaButtons, grauButtons, temaButtons);
+
+    try {
+      const response = await bardApi.post("/multiple_choice_question", {
+        subject: subject,
+        academic_level: academic_level,
+        theme: theme,
+        locale: "pt-br",
+      });
+      let regex = /`/g;
+
+      // Remover as crases usando replace
+      let jsonExtracted = response.data.response.replace(regex, "");
+      let json = JSON.parse(
+        jsonExtracted.substring(jsonExtracted.indexOf("{"))
+      );
+
+      setData(json.question_statement);
+      setQuestionOption(json.alternatives);
+      // setQuestionOption(({
+      //   ...options, isSelected: false
+      // }));
+      // console.log(questionOptions);
+      // setResponse(response.data.response);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoad(false);
+  };
+
+  const handleIndex= (index, button)=>{
+    const letter = ['a','b','c','d','e']
+    const newLetter = letter[index]
+    return button[newLetter]
+  }
   return (
     <S.Container>
       <Load active={load}></Load>
       <Modal
-        title={"UniTeck AI"}
+        title={"UniTech AI"}
         isOpen={openModal}
         setClose={() => setOpenModal(false)}
       >
         <S.LoadContainer>
-          <BallTriangle
-            height={100}
-            width={100}
-            radius={5}
-            color="#e53d00"
-            ariaLabel="ball-triangle-loading"
-            wrapperClass={{}}
-            wrapperStyle=""
-            visible={true}
-          />
+          {data ? (
+            <>
+              <Text
+                fontSize={"1rem"}
+                color={"#000000"}
+                fontWeight="600"
+                margin="0"
+              >
+                {data}
+              </Text>
+              {questionOptions.map((button, index) => (
+                <Card
+                  variant={"card2"}
+                  key={index}
+                  title={handleIndex(index, button)}
+                  isSelected={button.isSelected}
+                  onClick={() => handleOptionsButtonClick(handleIndex(index, button))}
+                />
+              ))}
+            </>
+          ) : (
+            <BallTriangle
+              height={100}
+              width={100}
+              radius={5}
+              color="#e53d00"
+              ariaLabel="ball-triangle-loading"
+              wrapperClass={{}}
+              wrapperStyle=""
+              visible={true}
+            />
+          )}
         </S.LoadContainer>
       </Modal>
       <S.ContainerHeader>
