@@ -180,7 +180,6 @@ const Home = () => {
         locale: "pt-br",
         isAcertive: state,
       });
-      setResponse("");
     } catch (e) {}
   };
 
