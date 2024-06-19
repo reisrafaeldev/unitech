@@ -88,7 +88,7 @@ export const Center = styled.div`
 export const LoadContainer = styled.div`
   width: 100%;
   height: 100%;
-  margin: 10rem 0;
+  margin: 1rem 0;
   display: flex;
   flex-direction: column;
   padding: 1rem;

@@ -40,6 +40,7 @@ const Login = () => {
       Swal.fire("Preencha todos os campos!!");
     }
   };
+
   const loginUser = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password)
       .then((value) => {

@@ -13,35 +13,21 @@ import { useLogin } from "../../contex/authContex";
 import Button from "../../components/button";
 import { BallTriangle } from "react-loader-spinner";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../../utils/config/firebase";
 
 const Home = () => {
-  const MAX_TOKENS = 4096;
-  const bottomRef = useRef(null);
-  const [messages, setMessages] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [error, setError] = useState(null);
+  const user = localStorage.getItem("user");
 
-  console.log("completion", messages);
-
-  const [systemPrompt, setSystemPrompt] = useState(
-    "You are a helpful assistant."
-  );
-  const [temp, setTemp] = useState(0.75);
-  const [topP, setTopP] = useState(0.9);
-  const [maxTokens, setMaxTokens] = useState(800);
   const bardApi = axios.create({
-    baseURL: "http://localhost:5000/gmni",
+    baseURL: "https://unitech-ai-api.onrender.com/gmni",
   });
 
   const nav = useNavigate();
-  const [titleModal, setTitleModal] = useState("teste");
   const [load, setLoad] = useState(false);
   const [data, setData] = useState();
-  const [dataModal, setDataModal] = useState();
-  const [lote, setLote] = useState();
-  const [name, setName] = useState();
-  const [idModal, setIdModal] = useState();
-  const { handleCpf, sessionToken } = useLogin();
+  const [correctAnswer, setCorrectAnswer] = useState();
   const [openModal, setOpenModal] = useState(false);
   const [questionOptions, setQuestionOption] = useState();
   const options = [
@@ -51,8 +37,6 @@ const Home = () => {
     { label: "Análise Semântica", isSelected: false },
     { label: "Análise Combinatória e Probabilidade", isSelected: false },
   ];
-  const [selectedButton, setSelectedButton] = useState(options);
-
   const [temaButtons, setTemaButtons] = useState([]);
   const [disciplinaButtons, setDisciplinaButtons] = useState([
     { label: "Matemática", isSelected: false },
@@ -72,14 +56,15 @@ const Home = () => {
 
     setTemaButtons(updatedButtons);
   };
-  const handleOptionsButtonClick = (clickedLabel) => {
-    const updatedButtons = questionOptions.map((button) => ({
+  const handleOptionsButtonClick = (indexClicked) => {
+    const updatedButtons = questionOptions.map((button, index) => ({
       ...button,
-      isSelected: button.label === clickedLabel,
+      isSelected: index === indexClicked,
     }));
 
-    setTemaButtons(updatedButtons);
+    setQuestionOption(updatedButtons);
   };
+
   const handleDcpClick = (clickedLabel) => {
     const updatedButtons = disciplinaButtons.map((button) => ({
       ...button,
@@ -96,11 +81,7 @@ const Home = () => {
 
     setGrauButtons(updatedButtons);
   };
-  const [size, setSize] = useState({
-    name: "Llama 2 70B",
-    version: "02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
-    shortened: "70B",
-  });
+
   const handleSelect = (tipo) => {
     const temasmatematica = [
       { label: "Álgebra", isSelected: false },
@@ -136,7 +117,6 @@ const Home = () => {
 
     const academic_level = grauButtons.filter((button) => button.isSelected);
     const theme = temaButtons.filter((button) => button.isSelected);
-    console.log(disciplinaButtons, grauButtons, temaButtons);
 
     try {
       const response = await bardApi.post("/multiple_choice_question", {
@@ -152,25 +132,58 @@ const Home = () => {
       let json = JSON.parse(
         jsonExtracted.substring(jsonExtracted.indexOf("{"))
       );
-
       setData(json.question_statement);
       setQuestionOption(json.alternatives);
-      // setQuestionOption(({
-      //   ...options, isSelected: false
-      // }));
-      // console.log(questionOptions);
-      // setResponse(response.data.response);
+      setCorrectAnswer(json.correct_answer);
     } catch (error) {
-      console.log(error);
     }
     setLoad(false);
   };
 
-  const handleIndex= (index, button)=>{
-    const letter = ['a','b','c','d','e']
-    const newLetter = letter[index]
-    return button[newLetter]
-  }
+  const handleIndex = (index, button) => {
+    const letter = ["a", "b", "c", "d", "e"];
+    return button[letter[index]];
+  };
+
+  const getSelectedOption = () => {
+    return questionOptions.find((option) => option.isSelected);
+  };
+  const handleResponse = () => {
+    const selectedOption = getSelectedOption();
+    if (selectedOption) {
+      const selectedKey = Object.keys(selectedOption).find(
+        (key) => key !== "isSelected"
+      );
+      if (selectedKey === correctAnswer) {
+        Swal.fire("Resposta correta!!");
+        saveData(true);
+      } else {
+        Swal.fire("Resposta errada!!");
+        saveData(false);
+      }
+      setLoad(false);
+      setOpenModal(false);
+    } else {
+    }
+  };
+  const saveData = async (state) => {
+    const subject = disciplinaButtons.filter((button) => button.isSelected);
+    const academic_level = grauButtons.filter((button) => button.isSelected);
+    const theme = temaButtons.filter((button) => button.isSelected);
+
+    try {
+      const docRef = await addDoc(collection(db, "questions"), {
+        user_id: user,
+        subject: subject,
+        academic_level: academic_level,
+        theme: theme,
+        locale: "pt-br",
+        isAcertive: state,
+      });
+      setResponse("");
+    } catch (e) {}
+  };
+
   return (
     <S.Container>
       <Load active={load}></Load>
@@ -190,15 +203,21 @@ const Home = () => {
               >
                 {data}
               </Text>
-              {questionOptions.map((button, index) => (
+              {questionOptions?.map((button, index) => (
                 <Card
-                  variant={"card2"}
+                  variant="card2"
                   key={index}
                   title={handleIndex(index, button)}
                   isSelected={button.isSelected}
-                  onClick={() => handleOptionsButtonClick(handleIndex(index, button))}
+                  onClick={() => handleOptionsButtonClick(index)}
                 />
               ))}
+              <Button
+                children={"Conferir"}
+                height={"2.5rem"}
+                type="button"
+                onClick={handleResponse}
+              />
             </>
           ) : (
             <BallTriangle
@@ -215,7 +234,7 @@ const Home = () => {
         </S.LoadContainer>
       </Modal>
       <S.ContainerHeader>
-        <Anchor
+        {/* <Anchor
           icon={false}
           fontSize="1.5rem"
           href="/"
@@ -224,30 +243,32 @@ const Home = () => {
           fontWeight={"600"}
         >
           Meu desenvolvimento
-        </Anchor>
+        </Anchor> */}
         <Image img={imageLogo} width="22rem" />
       </S.ContainerHeader>
       <S.ContainerCenter>
         <S.Center>
-          <Text
-            fontSize={"1.5rem"}
-            color={"#000000"}
-            fontWeight="600"
-            margin="0 0 0.5rem"
-          >
-            Selecione a Disciplina
-          </Text>
-          {disciplinaButtons.map((button, index) => (
-            <Card
-              variant={"card2"}
-              key={index}
-              title={button.label}
-              isSelected={button.isSelected}
-              onClick={() => (
-                handleDcpClick(button.label), handleSelect(button.label)
-              )}
-            />
-          ))}
+          <S.Overflow>
+            <Text
+              fontSize={"1.5rem"}
+              color={"#000000"}
+              fontWeight="600"
+              margin="0 0 0.5rem"
+            >
+              Selecione a Disciplina
+            </Text>
+            {disciplinaButtons.map((button, index) => (
+              <Card
+                variant={"card2"}
+                key={index}
+                title={button.label}
+                isSelected={button.isSelected}
+                onClick={() => (
+                  handleDcpClick(button.label), handleSelect(button.label)
+                )}
+              />
+            ))}
+          </S.Overflow>
         </S.Center>
         <S.Center>
           <S.Overflow>
@@ -271,46 +292,52 @@ const Home = () => {
           </S.Overflow>
         </S.Center>
         <S.Center>
-          <Text
-            fontSize={"1.5rem"}
-            color={"#000000"}
-            fontWeight="600"
-            margin="0 0 0.5rem"
-          >
-            Selecione a Dificuldade
-          </Text>
-          {temaButtons.length > 0 &&
-            grauButtons.map((button, index) => (
-              <Card
-                variant={"card2"}
-                key={index}
-                title={button.label}
-                isSelected={button.isSelected}
-                onClick={() => handleGrauClick(button.label)}
-              />
-            ))}
+          <S.Overflow>
+            <Text
+              fontSize={"1.5rem"}
+              color={"#000000"}
+              fontWeight="600"
+              margin="0 0 0.5rem"
+            >
+              Selecione a Dificuldade
+            </Text>
+            {temaButtons.length > 0 &&
+              grauButtons.map((button, index) => (
+                <Card
+                  variant={"card2"}
+                  key={index}
+                  title={button.label}
+                  isSelected={button.isSelected}
+                  onClick={() => handleGrauClick(button.label)}
+                />
+              ))}
+          </S.Overflow>
         </S.Center>
         <S.Center>
-          <Text
-            fontSize={"1.5rem"}
-            color={"#000000"}
-            fontWeight="600"
-            margin="0 0 0.5rem"
-          >
-            Gerar Questões
-          </Text>
+          <S.Overflow>
+            <Text
+              fontSize={"1.5rem"}
+              color={"#000000"}
+              fontWeight="600"
+              margin="0 0 0.5rem"
+            >
+              Gerar Questões
+            </Text>
 
-          <Button margin={"1rem 0"} onClick={generateQuestions}>
-            Gerar
-          </Button>
+            <Button margin={"1rem 0"} onClick={generateQuestions}>
+              Gerar
+            </Button>
+          </S.Overflow>
         </S.Center>
       </S.ContainerCenter>
       <Anchor
         icon={true}
+        onClick={() => (nav("/"), localStorage.clear())}
         fontSize="1.5rem"
         href="/"
         color={"#E53D00"}
         margin="0.5rem 0"
+        variant={"secondary"}
       >
         Sair
       </Anchor>

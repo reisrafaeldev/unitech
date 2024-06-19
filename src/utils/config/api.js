@@ -36,7 +36,6 @@ async function runLlama({
   topP,
   version,
 }) {
-  console.log("running llama");
   return await replicate.predictions.create({
     // IMPORTANT! You must enable streaming.
     stream: true,
@@ -54,7 +53,6 @@ async function runLlama({
 }
 
 async function runLlava({ prompt, maxTokens, temperature, topP, image }) {
-  console.log("running llava");
 
   return await replicate.predictions.create({
     // IMPORTANT! You must enable streaming.
@@ -72,7 +70,6 @@ async function runLlava({ prompt, maxTokens, temperature, topP, image }) {
 }
 
 async function runSalmonn({ prompt, maxTokens, temperature, topP, audio }) {
-  console.log("running salmonn");
 
   return await replicate.predictions.create({
     // IMPORTANT! You must enable streaming.

@@ -22,7 +22,6 @@ const RecoveryLogin = () => {
       await resetPassword(email);
     }
   };
-  console.log('email', email);
 
   return (
     <S.Container>

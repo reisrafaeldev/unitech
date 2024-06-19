@@ -11,12 +11,8 @@ export const LoginContext = createContext();
 export const LoginContexProvider = ({ children }) => {
   const [user, setUserAuth] = useState(false);
   const [title, setTitle] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [cpfNumber, setCpfNumber] = useState("");
   const [sessionToken, setSesionToken] = useState("");
-  const [pin, setPin] = useState("");
   const nav = useNavigate();
 
   const handleCpf = (value) => {
@@ -25,18 +21,16 @@ export const LoginContexProvider = ({ children }) => {
   const resetPassword = async (email) => {
     await sendPasswordResetEmail(auth, email)
       .then((value) => {
-        // Swal.fire("Enviado com sucesso! Verifique sua caixa de entrada!");
       })
       .catch((error) => {
-        // Swal.fire("E-mail não cadastrado!");
       });
   };
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-
     if (user) {
       setUserAuth(user);
+      nav("/home");
     }
   }, []);
 
@@ -44,7 +38,6 @@ export const LoginContexProvider = ({ children }) => {
     await createUserWithEmailAndPassword(auth, email, password)
       .then((value) => {
         setResponse(true);
-        // nav("/");
       })
       .catch((error) => {
         setResponse(false);
