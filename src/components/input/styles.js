@@ -17,7 +17,7 @@ export const Icon = styled.img`
   right: 8.125rem;
 `;
 export const Label = styled.label`
-  color: rgba(229, 61, 0);
+  color: #0085BD;
   font-size: 0.75rem;
   font-weight: bold;
   width: 100%;
@@ -33,7 +33,7 @@ export const Input = styled.input`
   padding: 0.7rem;
   font-weight: bold;
   letter-spacing: 0.0625rem;
-  border: ${props=> props.showError ? "1px solid #c60d00" : "1px solid transparent"};
+  border: ${props=> props.showError ? "1px solid  #0085BD;" : "1px solid transparent"};
 
     &::placeholder {
       color: #454545;
@@ -47,14 +47,14 @@ export const Input = styled.input`
 `;
 
 export const InputMask = styled(MaskedInput)`
-  background: rgba(229, 61, 0, 0.15);
+  background: rgb(198, 255, 150));
   color: #000;
   width: 100%;
   border-radius: 0.375rem;
   height: 2.5rem;
   padding: 0.7rem;
   letter-spacing: 0.0625rem;
-  border: ${props=> props.showError ? "1px solid #c60d00" : "1px solid transparent"};
+  border: ${props=> props.showError ? "1px solid  #074173;" : "1px solid transparent"};
 
     &::placeholder {
       color: #454545;

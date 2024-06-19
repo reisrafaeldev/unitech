@@ -1,18 +1,24 @@
-import React, { useContext, useState, createContext, useEffect } from "react";
+import React, { useContext, useState, createContext } from "react";
 import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/config/firebase";
+import Swal from "sweetalert2";
 
 export const LoginContext = createContext();
 
 export const LoginContexProvider = ({ children }) => {
-  const [user, setUserAuth] = useState(false);
-  const [title, setTitle] = useState("");
+  const [user, setUser] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [cpfNumber, setCpfNumber] = useState("");
   const [sessionToken, setSesionToken] = useState("");
+  const [pin, setPin] = useState("");
   const nav = useNavigate();
 
   const handleCpf = (value) => {
@@ -21,23 +27,30 @@ export const LoginContexProvider = ({ children }) => {
   const resetPassword = async (email) => {
     await sendPasswordResetEmail(auth, email)
       .then((value) => {
+        // Swal.fire("Enviado com sucesso! Verifique sua caixa de entrada!");
       })
       .catch((error) => {
+        // Swal.fire("E-mail não cadastrado!");
       });
   };
 
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setUserAuth(user);
-      nav("/home");
-    }
-  }, []);
-
+  const loginUser = async (email, password, setError) => {
+    console.log("senha", password);
+    await signInWithEmailAndPassword(auth, email, password)
+      .then((value) => {
+        setUser(value.user.uid);
+        nav("/home");
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(true);
+      });
+  };
   const createUser = async (email, password, setResponse) => {
     await createUserWithEmailAndPassword(auth, email, password)
       .then((value) => {
         setResponse(true);
+        nav("/");
       })
       .catch((error) => {
         setResponse(false);
@@ -51,12 +64,9 @@ export const LoginContexProvider = ({ children }) => {
     <LoginContext.Provider
       value={{
         handleCpf,
-        setUserAuth,
         cpfNumber,
-        user,
+        loginUser,
         createUser,
-        setTitle,
-        title,
         sessionToken,
         resetPassword,
         handleSessionToken,

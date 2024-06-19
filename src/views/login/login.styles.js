@@ -46,7 +46,7 @@ export const ContainerLogin = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: rgb(0, 0, 0, 0.2);
+  background-color: #F2F3F9;
   border-radius: 0.75rem;
   margin-top: 1.75rem;
   align-items: center;
@@ -71,5 +71,7 @@ export const ContainerLogin = styled.form`
 `
 
 export const Center= styled.div`
+`
+export const Test = styled.div`
 
 `

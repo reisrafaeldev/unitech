@@ -4,8 +4,8 @@ export const Container = styled.section`
   width: 100vw;
   min-height: 100vh;
   display: flex;
-  background: rgb(83,83,171);
-  background: radial-gradient(circle, rgba(83,83,171,0.4929621506805847) 0%, rgba(255,255,255,0.4313375008206407) 61%);
+  background-color: #FFFFFF;
+  /* background: linear-gradient(260deg, rgba(2,0,36,1) 0%, rgba(7,0,66,1) 16%, rgba(107,148,237,1) 62%, rgba(198,219,245,1) 84%, rgba(209,242,255,1) 100%); */
   input,
   textarea,
   select {

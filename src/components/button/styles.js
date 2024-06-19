@@ -15,7 +15,7 @@ export const Button = styled.button`
   border-radius: 0.25rem;
   transition: 0.2s;
   color: #fff;
-  background: linear-gradient(to right, #121FCF 0%, #CF1512 61%);
+  background: #074173;
   font-size: 1rem;
   &:hover {
     opacity: 0.5;

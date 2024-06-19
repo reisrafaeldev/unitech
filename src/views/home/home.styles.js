@@ -7,7 +7,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
 
   padding: 2rem;
 
@@ -54,8 +54,7 @@ export const ContainerCenter = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   padding: 0 2rem;
   border-radius: 3px;
-  background: linear-gradient(to right, #121FCF 0%, #CF1512 61%);
-
+  background-color: rgb(0, 0, 0, 0.5);
 
   @media (max-width: 1200px) {
     margin-top: 2rem;
@@ -88,10 +87,7 @@ export const Center = styled.div`
 export const LoadContainer = styled.div`
   width: 100%;
   height: 100%;
-  margin: 1rem 0;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
+  margin: 10rem 0;
   flex: 1;
   display: flex;
   align-items: center;
@@ -118,9 +114,8 @@ export const Overflow = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #121FCF 0%, #CF1512 61%);
+    background: #074173;
 
     border-radius: 6.25rem;
   }
 `;
-

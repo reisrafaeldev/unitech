@@ -50,7 +50,6 @@ const InputComponent = ({
     <Container>
       <Label for={placeholder}>{label}</Label>
       <Input
-       autocomplete="current-password"
         id={placeholder}
         showError={showError}
         onChange={onChangeText}
@@ -71,7 +70,6 @@ const InputComponent = ({
     <Container>
       <Label for={placeholder}>{label}</Label>
       <InputMask
-      autocomplete="current-password"
         id={placeholder}
         type={type}
         placeholder={placeholder}
@@ -86,7 +84,6 @@ const InputComponent = ({
     <Container>
       <Label for={placeholder}>{label}</Label>
       <Input
-      autocomplete="current-password"
         id={placeholder}
         showError={showError}
         onChange={onChangeText}

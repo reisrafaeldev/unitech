@@ -5,7 +5,6 @@ import { FaArrowLeft } from "react-icons/fa";
 const Anchor = ({
   icon,
   variant,
-  onClick,
   children,
   fontSize,
   margin,
@@ -31,22 +30,7 @@ const Anchor = ({
         {children}
       </S.AnchorComponent>
     </S.Container>
-  ):  variant === 'secondary' ? (
-    <S.Container margin={margin} width={width}>
-    {icon && <S.Icon fontSize={fontSize} color={color} />}
-    <S.AnchorComponent
-      onClick={onClick}
-      href={href}
-      as={as}
-      fontSize={fontSize}
-      color={color}
-      fontWeight={fontWeight}
-    >
-      {children}
-    </S.AnchorComponent>
-  </S.Container>
-
-  ) : (
+  ):(
     <S.Container margin={margin} width={width}>
     {icon && <S.Icon fontSize={fontSize} color={color} />}
     <S.AnchorComponent

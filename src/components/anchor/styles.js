@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa";
 export const AnchorComponent = styled.a`
   font-size: ${(props) => props.fontSize || "1rem"};
   color: ${(props) => props.color || "#000"};
-  font-weight:${(props) => props.fontWeight || "normal"};
+  
   text-decoration: none;
   &:hover {
     color: #000;
